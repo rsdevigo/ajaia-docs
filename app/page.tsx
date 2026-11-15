@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import DeleteDocumentButton from "@/components/DeleteDocumentButton";
 import NewDocumentButton from "@/components/NewDocumentButton";
 import { getCurrentUser } from "@/lib/auth";
 import { listDocumentsForUser, type DocumentListItem } from "@/lib/documents";
@@ -8,11 +9,8 @@ const dateFormat = new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeZ
 
 function DocumentRow({ doc, showOwner }: { doc: DocumentListItem; showOwner: boolean }) {
   return (
-    <li>
-      <Link
-        href={`/documents/${doc.id}`}
-        className="flex items-center justify-between gap-4 rounded border bg-white px-4 py-3 hover:border-blue-400"
-      >
+    <li className="flex items-center gap-2 rounded border bg-white px-4 py-3 hover:border-blue-400">
+      <Link href={`/documents/${doc.id}`} className="flex min-w-0 flex-1 items-center justify-between gap-4">
         <div className="min-w-0">
           <p className="truncate font-medium">{doc.title}</p>
           <p className="text-xs text-gray-500">
@@ -26,6 +24,7 @@ function DocumentRow({ doc, showOwner }: { doc: DocumentListItem; showOwner: boo
           </span>
         )}
       </Link>
+      {doc.role === "owner" && <DeleteDocumentButton id={doc.id} title={doc.title} />}
     </li>
   );
 }

@@ -6,6 +6,7 @@ export type SaveStatus = "saved" | "unsaved" | "saving" | "error";
 type Patch = { title?: string; content?: object };
 
 const DEBOUNCE_MS = 800;
+const KEEPALIVE_MAX_CHARS = 60_000;
 const hasChanges = (p: Patch) => p.title !== undefined || p.content !== undefined;
 
 /**
@@ -22,12 +23,15 @@ export function useAutosave(documentId: string) {
   const inFlight = useRef<Promise<boolean> | null>(null);
 
   const send = useCallback(
-    async (patch: Patch) => {
+    async (patch: Patch, keepalive: boolean) => {
       try {
+        const body = JSON.stringify(patch);
         const res = await fetch(`/api/documents/${documentId}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(patch),
+          body,
+          // keepalive lets the request outlive the page; browsers cap its body at 64 KB.
+          keepalive: keepalive && body.length < KEEPALIVE_MAX_CHARS,
         });
         return res.ok;
       } catch {
@@ -38,7 +42,7 @@ export function useAutosave(documentId: string) {
   );
 
   /** Resolves true if everything pending has been saved (or nothing was pending). */
-  const save = useCallback(async (): Promise<boolean> => {
+  const save = useCallback(async (opts?: { keepalive?: boolean }): Promise<boolean> => {
     clearTimeout(timer.current);
     while (inFlight.current) await inFlight.current;
 
@@ -47,7 +51,7 @@ export function useAutosave(documentId: string) {
     pending.current = {};
     setStatus("saving");
 
-    const request = send(patch);
+    const request = send(patch, opts?.keepalive ?? false);
     inFlight.current = request;
     const ok = await request;
     inFlight.current = null;
@@ -80,10 +84,16 @@ export function useAutosave(documentId: string) {
     return () => window.removeEventListener("beforeunload", warn);
   }, [status]);
 
-  // Leaving via in-app navigation (e.g. browser back): flush whatever is pending.
+  // Leaving the page (browser back, tab close, reload): flush whatever is pending,
+  // with keepalive so the request isn't cancelled by the navigation.
   useEffect(() => {
+    const flush = () => {
+      if (hasChanges(pending.current)) void save({ keepalive: true });
+    };
+    window.addEventListener("pagehide", flush);
     return () => {
-      if (hasChanges(pending.current)) void save();
+      window.removeEventListener("pagehide", flush);
+      flush(); // component unmount = in-app navigation
     };
   }, [save]);
 

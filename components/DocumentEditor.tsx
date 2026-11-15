@@ -4,6 +4,7 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit"; // v3 StarterKit already bundles Underline
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import ShareDialog from "./ShareDialog";
 import Toolbar from "./Toolbar";
 import { useAutosave, type SaveStatus } from "./useAutosave";
 
@@ -74,12 +75,18 @@ export default function DocumentEditor({ doc }: { doc: LoadedDocument }) {
           ← Documents
         </button>
         <div className="flex items-center gap-3">
+          {doc.role !== "owner" && (
+            <span className="text-sm text-gray-600 capitalize">
+              Shared by {doc.ownerName} · {doc.role}
+            </span>
+          )}
           {!editable && (
             <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
               View only
             </span>
           )}
           {editable && <StatusIndicator status={status} onRetry={() => void save()} />}
+          {doc.role === "owner" && <ShareDialog documentId={doc.id} />}
         </div>
       </div>
 
@@ -99,9 +106,6 @@ export default function DocumentEditor({ doc }: { doc: LoadedDocument }) {
         ) : (
           <h1 className="mb-6 text-3xl font-semibold">{doc.title}</h1>
         )}
-        {!editable || doc.role === "editor" ? (
-          <p className="-mt-4 mb-6 text-xs text-gray-500">Owner: {doc.ownerName}</p>
-        ) : null}
         <EditorContent editor={editor} />
       </div>
     </main>
