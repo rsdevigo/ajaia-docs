@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { jsonError } from "@/lib/api";
+import { handle, jsonError } from "@/lib/api";
 import { ImportError, importToHtml } from "@/lib/import";
 import { IMPORT_MAX_BYTES, detectKind, titleFromFilename } from "@/lib/import-rules";
 
@@ -12,7 +12,7 @@ const MULTIPART_OVERHEAD = 100_000; // boundaries + headers around the file
  * It does not create a document: the browser turns the HTML into Tiptap JSON
  * (needs a DOM) and then creates the document via POST /api/documents.
  */
-export async function POST(req: Request) {
+async function importFile(req: Request) {
   const user = await getCurrentUser();
   if (!user) return jsonError("Authentication required", 401);
 
@@ -44,3 +44,5 @@ export async function POST(req: Request) {
     return jsonError("Could not import this file", 500); // never leak internals
   }
 }
+
+export const POST = handle(importFile);

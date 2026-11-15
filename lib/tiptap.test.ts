@@ -43,3 +43,12 @@ describe("isTiptapDoc", () => {
     expect(isTiptapDoc({ type: "doc", content: [node] })).toBe(false);
   });
 });
+
+describe("isTiptapDoc (structure, not just node names)", () => {
+  // Every node/mark name below is individually allowed, but the nesting is not valid for the editor.
+  it("rejects documents the editor schema cannot hold", () => {
+    expect(isTiptapDoc({ type: "doc", content: [{ type: "listItem" }] })).toBe(false); // listItem outside a list
+    expect(isTiptapDoc({ type: "doc", content: [{ type: "paragraph", content: [{ type: "paragraph" }] }] })).toBe(false); // block inside inline
+    expect(isTiptapDoc({ type: "doc", content: [] })).toBe(false); // doc needs at least one block
+  });
+});

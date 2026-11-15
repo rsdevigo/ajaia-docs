@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import { handle } from "@/lib/api";
 import { db } from "@/lib/db";
 import { SESSION_COOKIE, SESSION_MAX_AGE, createSessionToken } from "@/lib/session";
 
@@ -12,7 +13,7 @@ const bodySchema = z.object({
 // Compared against when the email is unknown, so response time doesn't reveal which emails exist.
 const DUMMY_HASH = bcrypt.hashSync("not-a-real-password", 10);
 
-export async function POST(req: Request) {
+async function login(req: Request) {
   const body = await req.json().catch(() => null);
   const parsed = bodySchema.safeParse(body);
   if (!parsed.success) {
@@ -36,3 +37,5 @@ export async function POST(req: Request) {
   });
   return res;
 }
+
+export const POST = handle(login);

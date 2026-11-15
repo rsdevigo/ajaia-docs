@@ -6,14 +6,9 @@ const PUBLIC_PATHS = ["/login", "/api/auth/login", "/api/auth/logout"];
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+  if (PUBLIC_PATHS.includes(pathname)) return NextResponse.next();
+
   const userId = await verifySessionToken(req.cookies.get(SESSION_COOKIE)?.value);
-
-  if (PUBLIC_PATHS.includes(pathname)) {
-    // Already signed in? Skip the login form.
-    if (userId && pathname === "/login") return NextResponse.redirect(new URL("/", req.url));
-    return NextResponse.next();
-  }
-
   if (!userId) {
     if (pathname.startsWith("/api/")) {
       return NextResponse.json({ error: "Authentication required" }, { status: 401 });

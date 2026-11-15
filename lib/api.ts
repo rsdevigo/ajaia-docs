@@ -58,3 +58,19 @@ export async function authorizeDocument(
   }
   return { ok: true, user, access };
 }
+
+/**
+ * Wraps a route handler so an unexpected error (DB down, bug) becomes a JSON
+ * `{ error }` 500 instead of a framework error page. Details are logged server-side
+ * only; nothing about the error is sent to the client.
+ */
+export function handle<Args extends unknown[]>(fn: (...args: Args) => Promise<Response>) {
+  return async (...args: Args): Promise<Response> => {
+    try {
+      return await fn(...args);
+    } catch (err) {
+      console.error("Unhandled API error:", err);
+      return jsonError("Something went wrong. Please try again.", 500);
+    }
+  };
+}

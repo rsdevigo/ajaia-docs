@@ -3,7 +3,7 @@ import type { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
-import { jsonError, readJsonBody } from "@/lib/api";
+import { handle, jsonError, readJsonBody } from "@/lib/api";
 import { listDocumentsForUser } from "@/lib/documents";
 import { EMPTY_DOC, isTiptapDoc } from "@/lib/tiptap";
 
@@ -15,13 +15,13 @@ const createSchema = z
   })
   .strict();
 
-export async function GET() {
+async function listDocuments() {
   const user = await getCurrentUser();
   if (!user) return jsonError("Authentication required", 401);
   return NextResponse.json(await listDocumentsForUser(user.id));
 }
 
-export async function POST(req: Request) {
+async function createDocument(req: Request) {
   const user = await getCurrentUser();
   if (!user) return jsonError("Authentication required", 401);
 
@@ -42,3 +42,6 @@ export async function POST(req: Request) {
   });
   return NextResponse.json({ id: doc.id }, { status: 201 });
 }
+
+export const GET = handle(listDocuments);
+export const POST = handle(createDocument);

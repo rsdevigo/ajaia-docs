@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { canManageSharing } from "@/lib/access";
-import { authorizeDocument, jsonError } from "@/lib/api";
+import { authorizeDocument, handle, jsonError } from "@/lib/api";
 import { roleSchema, shareSelect, toDbRole, toShareDto } from "@/lib/shares";
 
 const addSchema = z.object({
@@ -12,7 +12,7 @@ const addSchema = z.object({
 
 type Ctx = { params: Promise<{ id: string }> };
 
-export async function GET(_req: Request, { params }: Ctx) {
+async function listShares(_req: Request, { params }: Ctx) {
   const { id } = await params;
   const auth = await authorizeDocument(id, canManageSharing);
   if (!auth.ok) return auth.res;
@@ -26,7 +26,7 @@ export async function GET(_req: Request, { params }: Ctx) {
 }
 
 /** Share with a user by email. Sharing again with the same user updates their role. */
-export async function POST(req: Request, { params }: Ctx) {
+async function addShare(req: Request, { params }: Ctx) {
   const { id } = await params;
   const auth = await authorizeDocument(id, canManageSharing);
   if (!auth.ok) return auth.res;
@@ -51,3 +51,6 @@ export async function POST(req: Request, { params }: Ctx) {
   });
   return NextResponse.json({ share: toShareDto(share) });
 }
+
+export const GET = handle(listShares);
+export const POST = handle(addShare);

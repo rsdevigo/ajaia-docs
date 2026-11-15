@@ -33,24 +33,25 @@ async function main() {
     ),
   );
 
-  // Fixed id keeps the seed idempotent.
-  const doc = await db.document.upsert({
-    where: { id: "seed-welcome-doc" },
-    update: {},
-    create: {
-      id: "seed-welcome-doc",
+  // Safe to re-run against a live database: existing users are left untouched (no password
+  // reset), and the demo document + Bob's share are only created if the document doesn't
+  // exist yet, so a re-run never undoes edits, role changes or revocations made since.
+  const SEED_DOC_ID = "seed-welcome-doc";
+  const existing = await db.document.findUnique({ where: { id: SEED_DOC_ID }, select: { id: true } });
+  if (existing) {
+    console.log("Users ensured. Demo document already exists, left unchanged.");
+    return;
+  }
+
+  await db.document.create({
+    data: {
+      id: SEED_DOC_ID,
       title: "Welcome to Ajaia Docs",
       content: welcomeContent,
       ownerId: alice.id,
+      shares: { create: { userId: bob.id, role: "EDITOR" } },
     },
   });
-
-  await db.documentShare.upsert({
-    where: { documentId_userId: { documentId: doc.id, userId: bob.id } },
-    update: { role: "EDITOR" },
-    create: { documentId: doc.id, userId: bob.id, role: "EDITOR" },
-  });
-
   console.log("Seeded alice, bob, carol (password: demo1234) and one shared document.");
 }
 

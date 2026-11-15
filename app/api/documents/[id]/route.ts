@@ -3,7 +3,7 @@ import type { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { canDelete, canEdit, canRead } from "@/lib/access";
-import { authorizeDocument, jsonError, readJsonBody } from "@/lib/api";
+import { authorizeDocument, handle, jsonError, readJsonBody } from "@/lib/api";
 import { isTiptapDoc } from "@/lib/tiptap";
 
 /*
@@ -22,7 +22,7 @@ const patchSchema = z
 
 type Ctx = { params: Promise<{ id: string }> };
 
-export async function GET(_req: Request, { params }: Ctx) {
+async function getDocument(_req: Request, { params }: Ctx) {
   const { id } = await params;
   const auth = await authorizeDocument(id, canRead);
   if (!auth.ok) return auth.res;
@@ -49,7 +49,7 @@ export async function GET(_req: Request, { params }: Ctx) {
   });
 }
 
-export async function PATCH(req: Request, { params }: Ctx) {
+async function updateDocument(req: Request, { params }: Ctx) {
   const { id } = await params;
   const auth = await authorizeDocument(id, canEdit);
   if (!auth.ok) return auth.res;
@@ -71,7 +71,7 @@ export async function PATCH(req: Request, { params }: Ctx) {
   return NextResponse.json({ updatedAt: updated.updatedAt });
 }
 
-export async function DELETE(_req: Request, { params }: Ctx) {
+async function deleteDocument(_req: Request, { params }: Ctx) {
   const { id } = await params;
   const auth = await authorizeDocument(id, canDelete);
   if (!auth.ok) return auth.res;
@@ -79,3 +79,7 @@ export async function DELETE(_req: Request, { params }: Ctx) {
   await db.document.delete({ where: { id } });
   return NextResponse.json({ ok: true });
 }
+
+export const GET = handle(getDocument);
+export const PATCH = handle(updateDocument);
+export const DELETE = handle(deleteDocument);

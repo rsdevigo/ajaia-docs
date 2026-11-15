@@ -1,5 +1,12 @@
-// Shape validation for stored Tiptap documents. Whitelists the node/mark types
-// that StarterKit + Underline can produce, so arbitrary JSON can't be stored.
+// Validation for stored Tiptap documents, in two stages:
+// 1. a cheap shape check (whitelisted node/mark names, depth cap) so huge or hostile input
+//    never reaches the second stage;
+// 2. the editor's own schema (built from the shared extension list) must accept the structure,
+//    so a document the editor can't load can't be stored via the API.
+import { getSchema } from "@tiptap/core";
+import { editorExtensions } from "./editor-extensions";
+
+const schema = getSchema(editorExtensions);
 
 const NODE_TYPES = new Set([
   "doc",
@@ -51,6 +58,15 @@ function validNode(node: unknown, depth: number): boolean {
   return true;
 }
 
+function matchesEditorSchema(doc: unknown): boolean {
+  try {
+    schema.nodeFromJSON(doc).check();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function isTiptapDoc(value: unknown): boolean {
-  return isObject(value) && value.type === "doc" && validNode(value, 0);
+  return isObject(value) && value.type === "doc" && validNode(value, 0) && matchesEditorSchema(value);
 }
