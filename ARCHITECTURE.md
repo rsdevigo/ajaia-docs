@@ -55,11 +55,12 @@ The original file is not kept. Import is a one-way conversion; storing uploads w
 
 ## What I prioritized
 
-1. A working vertical path first (login, then documents and the editor, then sharing, then import), so each step could be tested before the next.
-2. Server-side access control and its tests, because sharing is the part where mistakes matter.
-3. Autosave that is honest about failure: `Saved` appears only after a successful response, failed changes are kept for retry, and pending changes are flushed when leaving the page.
-4. A safe import path (validation, sanitizing, shared schema) over wide format support.
-5. Visual polish last. The UI is functional and plain.
+1. Deployment first. The app was deployed to Vercel with Neon within the first hour, right after auth, on purpose: a working live URL is a hard requirement, and Prisma, Neon connections and Vercel builds are where deployments usually go wrong, so that risk was removed before building features on top.
+2. A working vertical path (login, then documents and the editor, then sharing, then import), so each step could be tested before the next.
+3. Server-side access control and its tests, because sharing is the part where mistakes matter.
+4. Autosave that is honest about failure: `Saved` appears only after a successful response, failed changes are kept for retry, and pending changes are flushed when leaving the page.
+5. A safe import path (validation, sanitizing, shared schema) over wide format support.
+6. Visual polish last. The UI is functional and plain.
 
 ## Deliberate scope cuts
 
