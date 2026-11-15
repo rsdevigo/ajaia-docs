@@ -4,7 +4,7 @@
 
 - **Live app:** `https://ajaia-docs-indol.vercel.app/`
 - **Repository:** `https://github.com/rsdevigo/ajaia-docs`
-- **Demo video (3–5 min):** `<VIDEO_URL>`
+- **Demo video (3–5 min):** `https://drive.google.com/file/d/1Df_89de0IrfMMECbjW35JVTbu08i77q5/view?usp=sharing`
 
 ## Checklist
 
@@ -17,7 +17,7 @@
 | AI workflow note | `AI_WORKFLOW.md` | To be written by the author from the log below |
 | Log of AI-assisted steps (source for the note above) | [ai-log.md](ai-log.md) | Done (entries P0–P6) |
 | Automated tests | `npm test`, 38 tests in [lib/](lib) and [tests/](tests) | Done |
-| Demo video | `<VIDEO_URL>` | Fill in the URL |
+| Demo video | `https://drive.google.com/file/d/1Df_89de0IrfMMECbjW35JVTbu08i77q5/view?usp=sharing` | Fill in the URL |
 
 ## Test accounts
 
