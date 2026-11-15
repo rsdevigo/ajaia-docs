@@ -2,7 +2,7 @@
 
 ## Links
 
-- **Live app:** `<LIVE_URL>`
+- **Live app:** `https://ajaia-docs-indol.vercel.app/`
 - **Repository:** `<REPO_URL>`
 - **Demo video (3–5 min):** `<VIDEO_URL>`
 
@@ -11,7 +11,7 @@
 | Item | Where | Status |
 |---|---|---|
 | Working app, source code | this repository | Done |
-| Live deployment | `<LIVE_URL>` | Fill in the URL |
+| Live deployment | `https://ajaia-docs-indol.vercel.app/` | Fill in the URL |
 | README (setup, accounts, tests, import limits) | [README.md](README.md) | Done |
 | Architecture note (1 page) | [ARCHITECTURE.md](ARCHITECTURE.md) | Done |
 | AI workflow note | `AI_WORKFLOW.md` | To be written by the author from the log below |
@@ -49,3 +49,12 @@
 - **Security items left open on purpose:** no login rate limiting, sharing reveals whether an email has an account, public demo password.
 - **Import limits:** no `.doc` or `.pdf`; images and table structure are dropped.
 - **Schema changes use `prisma db push`;** there is no migration history.
+
+### What I would build next (2–4 more hours)
+
+1. Tests for the share routes, and one browser test of the main path (sign in, edit, share, view as another user).
+2. Login rate limiting, and a less revealing message when sharing with an unknown email.
+3. Tell an open editor when its access was removed or changed, instead of failing at the next save.
+4. Move from `db push` to Prisma migrations before the schema changes again.
+
+Real-time editing (for example Yjs) would be the next larger step after these.
