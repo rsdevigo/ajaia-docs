@@ -3,7 +3,7 @@
 ## Links
 
 - **Live app:** `https://ajaia-docs-indol.vercel.app/`
-- **Repository:** `<REPO_URL>`
+- **Repository:** `https://github.com/rsdevigo/ajaia-docs`
 - **Demo video (3–5 min):** `<VIDEO_URL>`
 
 ## Checklist
@@ -16,7 +16,7 @@
 | Architecture note (1 page) | [ARCHITECTURE.md](ARCHITECTURE.md) | Done |
 | AI workflow note | `AI_WORKFLOW.md` | To be written by the author from the log below |
 | Log of AI-assisted steps (source for the note above) | [ai-log.md](ai-log.md) | Done (entries P0–P6) |
-| Automated tests | `npm test`, 36 tests in [lib/](lib) and [tests/](tests) | Done |
+| Automated tests | `npm test`, 38 tests in [lib/](lib) and [tests/](tests) | Done |
 | Demo video | `<VIDEO_URL>` | Fill in the URL |
 
 ## Test accounts
@@ -32,12 +32,13 @@
 | File upload that fits the product | Works | `.txt`, `.md`, `.docx` up to 2 MB become a new editable document. Images and table structure are dropped. |
 | Sharing: owner, grant access, owned vs shared | Works | Share by email as Editor or Viewer; change or remove access; enforced on the server. Dashboard has "My documents" and "Shared with me". |
 | Persistence across refresh | Works | Postgres (Neon). |
+| Stretch: export | Works | "Export as Markdown" in the editor header, for anyone with read access; downloads `<title>.md`. Underline has no Markdown equivalent and is exported as plain text. |
 | Validation and error handling | Works | zod on request bodies, content validated against the editor schema, JSON `{ error }` responses with 400/401/403/404/413/415, visible save-failure state. |
 | At least one meaningful automated test | Done | Access-control matrix, route-level PATCH test, content validation, session tokens, import converters. |
 
 ## Verification
 
-- **Automated:** `npm test` (36 tests) and `npm run build` pass.
+- **Automated:** `npm test` (38 tests) and `npm run build` pass.
 - **Manual, by the author:** click-throughs of editing and autosave, sharing and revocation across two users, import (including an XSS payload in a `.md`), and the stricter content validation are recorded in [ai-log.md](ai-log.md) (P3–P6).
 
 ## Partial or not done
@@ -45,7 +46,7 @@
 - **Real-time collaboration:** not built; last-write-wins. Two people editing at once can overwrite each other.
 - **Not built, by choice:** OAuth or registration, password reset, comments, version history, storing the uploaded original. See [ARCHITECTURE.md](ARCHITECTURE.md).
 - **Access changes are not live:** an editor open in another tab learns its access was removed only when the next save fails.
-- **No automated tests** for the share routes, the editor UI or the browser half of import.
+- **No automated tests** for the share routes, the editor UI, the browser half of import or the export download itself (only the Markdown converter is tested).
 - **Security items left open on purpose:** no login rate limiting, sharing reveals whether an email has an account, public demo password.
 - **Import limits:** no `.doc` or `.pdf`; images and table structure are dropped.
 - **Schema changes use `prisma db push`;** there is no migration history.

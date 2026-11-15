@@ -2,7 +2,7 @@
 
 A small document editor in the spirit of Google Docs: create, rename, edit and share rich-text documents, and import `.txt`, `.md` or `.docx` files as new documents. Built for the Ajaia Full Stack Product Engineer assignment within a ~4 hour timebox.
 
-- **Live app:** `<LIVE_URL>`
+- **Live app:** `https://ajaia-docs-indol.vercel.app/`
 - **Architecture and decisions:** [ARCHITECTURE.md](ARCHITECTURE.md)
 - **Submission checklist:** [SUBMISSION.md](SUBMISSION.md)
 
@@ -14,6 +14,7 @@ A small document editor in the spirit of Google Docs: create, rename, edit and s
 - Share a document with another seeded user by email as **Editor** or **Viewer**. The owner can change or remove access. Viewers get a read-only editor with a "View only" badge.
 - The dashboard separates **My documents** from **Shared with me**. Shared documents show the owner and your role.
 - Import a file as a new document you own (see below).
+- **Export as Markdown** (extra feature): anyone who can open a document, including viewers, can download it as `<title>.md`. Headings, bold, italic, lists (nested and numbered), links, quotes and code are converted; **underline has no Markdown equivalent and is exported as plain text**. The export reflects what is on screen, including edits not yet saved.
 - Work persists in Postgres, so documents survive refresh and re-login.
 
 ## Demo accounts
@@ -49,11 +50,11 @@ npm run dev                 # http://localhost:3000
 ## Tests and build
 
 ```bash
-npm test          # 36 tests, no database needed
+npm test          # 38 tests, no database needed
 npm run build
 ```
 
-The tests cover the access-control rules (owner / editor / viewer / no access against read, edit, manage sharing, delete), a route-level test of `PATCH /api/documents/[id]` with auth and the database mocked, document-content validation, session tokens, and the three import converters (including a real `.docx` fixture in [tests/fixtures](tests/fixtures)).
+The tests cover the access-control rules (owner / editor / viewer / no access against read, edit, manage sharing, delete), a route-level test of `PATCH /api/documents/[id]` with auth and the database mocked, document-content validation, session tokens, the three import converters (including a real `.docx` fixture in [tests/fixtures](tests/fixtures)), and the Markdown export converter.
 
 ## File import
 

@@ -3,6 +3,7 @@
 import { EditorContent, useEditor } from "@tiptap/react";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import ExportMarkdownButton from "./ExportMarkdownButton";
 import ShareDialog from "./ShareDialog";
 import { editorExtensions } from "@/lib/editor-extensions";
 import Toolbar from "./Toolbar";
@@ -86,6 +87,7 @@ export default function DocumentEditor({ doc }: { doc: LoadedDocument }) {
             </span>
           )}
           {editable && <StatusIndicator status={status} onRetry={() => void save()} />}
+          <ExportMarkdownButton editor={editor} title={title.trim() || committedTitle.current} />
           {doc.role === "owner" && <ShareDialog documentId={doc.id} />}
         </div>
       </div>
