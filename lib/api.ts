@@ -6,6 +6,35 @@ export function jsonError(error: string, status: number) {
   return NextResponse.json({ error }, { status });
 }
 
+export const MAX_JSON_BYTES = 1_000_000; // ~1 MB
+
+type JsonBody = { ok: true; body: unknown } | { ok: false; res: NextResponse };
+
+/**
+ * Reads a JSON request body with a size cap (413) and JSON syntax check (400).
+ * With allowEmpty, a missing body yields `undefined` instead of an error.
+ */
+export async function readJsonBody(
+  req: Request,
+  opts: { allowEmpty?: boolean } = {},
+): Promise<JsonBody> {
+  const tooLarge = () => ({
+    ok: false as const,
+    res: jsonError("Document is too large (max ~1 MB)", 413),
+  });
+
+  if (Number(req.headers.get("content-length") ?? 0) > MAX_JSON_BYTES) return tooLarge();
+  const raw = await req.text();
+  if (Buffer.byteLength(raw) > MAX_JSON_BYTES) return tooLarge();
+
+  if (raw.trim() === "" && opts.allowEmpty) return { ok: true, body: undefined };
+  try {
+    return { ok: true, body: JSON.parse(raw) };
+  } catch {
+    return { ok: false, res: jsonError("Request body must be valid JSON", 400) };
+  }
+}
+
 type Authorized =
   | { ok: true; user: CurrentUser; access: AccessLevel }
   | { ok: false; res: NextResponse };

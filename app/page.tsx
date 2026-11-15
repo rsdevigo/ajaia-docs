@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import DeleteDocumentButton from "@/components/DeleteDocumentButton";
+import ImportFile from "@/components/ImportFile";
 import NewDocumentButton from "@/components/NewDocumentButton";
 import { getCurrentUser } from "@/lib/auth";
 import { listDocumentsForUser, type DocumentListItem } from "@/lib/documents";
@@ -69,6 +70,7 @@ export default async function Dashboard() {
         <h1 className="text-2xl font-semibold">Documents</h1>
         <NewDocumentButton />
       </div>
+      <ImportFile />
       <Section
         title="My documents"
         docs={owned}

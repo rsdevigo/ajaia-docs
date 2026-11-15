@@ -1,10 +1,10 @@
 "use client";
 
 import { EditorContent, useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit"; // v3 StarterKit already bundles Underline
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import ShareDialog from "./ShareDialog";
+import { editorExtensions } from "@/lib/editor-extensions";
 import Toolbar from "./Toolbar";
 import { useAutosave, type SaveStatus } from "./useAutosave";
 
@@ -41,7 +41,7 @@ export default function DocumentEditor({ doc }: { doc: LoadedDocument }) {
   const committedTitle = useRef(doc.title);
 
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: editorExtensions,
     content: doc.content,
     editable,
     immediatelyRender: false, // avoids SSR hydration mismatch in Next.js

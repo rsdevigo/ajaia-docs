@@ -3,7 +3,7 @@ import type { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { canDelete, canEdit, canRead } from "@/lib/access";
-import { authorizeDocument, jsonError } from "@/lib/api";
+import { authorizeDocument, jsonError, readJsonBody } from "@/lib/api";
 import { isTiptapDoc } from "@/lib/tiptap";
 
 /*
@@ -11,8 +11,6 @@ import { isTiptapDoc } from "@/lib/tiptap";
  * same document, the most recent PATCH overwrites the other's content. Real-time
  * collaboration / conflict resolution is a deliberate scope cut.
  */
-
-const MAX_BODY_BYTES = 1_000_000; // ~1 MB
 
 const patchSchema = z
   .object({
@@ -56,22 +54,10 @@ export async function PATCH(req: Request, { params }: Ctx) {
   const auth = await authorizeDocument(id, canEdit);
   if (!auth.ok) return auth.res;
 
-  const declared = Number(req.headers.get("content-length") ?? 0);
-  if (declared > MAX_BODY_BYTES) return jsonError("Document is too large (max ~1 MB)", 413);
+  const read = await readJsonBody(req);
+  if (!read.ok) return read.res;
 
-  const raw = await req.text();
-  if (Buffer.byteLength(raw) > MAX_BODY_BYTES) {
-    return jsonError("Document is too large (max ~1 MB)", 413);
-  }
-
-  let body: unknown;
-  try {
-    body = JSON.parse(raw);
-  } catch {
-    return jsonError("Request body must be valid JSON", 400);
-  }
-
-  const parsed = patchSchema.safeParse(body);
+  const parsed = patchSchema.safeParse(read.body);
   if (!parsed.success) {
     return jsonError(parsed.error.issues[0]?.message ?? "Invalid request", 400);
   }
