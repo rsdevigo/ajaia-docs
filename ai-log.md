@@ -1,0 +1,2 @@
+P0 – Scope critique. Accepted: deploy-first, Neon pooled/direct URLs, immediatelyRender:false, client-side HTML→Tiptap conversion (generateJSON needs a DOM), import order txt→md→docx, API test made optional. Rejected: cutting the viewer/editor UI distinction — it's cheap, required for a credible read-only mode, and covers a stretch item. Also caught a hallucinated option name ("immediatelyexecute") in the AI's answer.
+
